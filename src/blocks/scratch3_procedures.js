@@ -1,6 +1,5 @@
-const Cast = require('../util/cast');
 class Scratch3ProcedureBlocks {
-    constructor(runtime) {
+    constructor (runtime) {
         /**
          * The runtime instantiating this block package.
          * @type {Runtime}
@@ -12,7 +11,7 @@ class Scratch3ProcedureBlocks {
      * Retrieve the block primitives implemented by this package.
      * @return {object.<string, Function>} Mapping of opcode to Function.
      */
-    getPrimitives() {
+    getPrimitives () {
         return {
             procedures_definition: this.definition,
             procedures_call: this.call,
@@ -21,7 +20,7 @@ class Scratch3ProcedureBlocks {
         };
     }
 
-    definition() {
+    definition () {
         // No-op: execute the blocks.
     }
 
@@ -44,31 +43,19 @@ class Scratch3ProcedureBlocks {
             // at earlier stack frames for the values of a given parameter (#1729)
             util.initParams();
             for (let i = 0; i < paramIds.length; i++) {
-                if (args.hasOwnProperty(paramIds[i])) {
+                if (Object.prototype.hasOwnProperty.call(args, paramIds[i])) {
                     util.pushParam(paramNames[i], args[paramIds[i]]);
                 } else {
                     util.pushParam(paramNames[i], paramDefaults[i]);
                 }
             }
 
-            const addonBlock = util.runtime.getAddonBlock(procedureCode);
-            if (addonBlock) {
-                const result = addonBlock.callback(util.thread.getAllparams(), util);
-                if (util.thread.status === 1 /* STATUS_PROMISE_WAIT */) {
-                    // If the addon block is using STATUS_PROMISE_WAIT to force us to sleep,
-                    // make sure to not re-run this block when we resume.
-                    util.stackFrame.executed = true;
-                }
-                return result;
-            }
-
             util.stackFrame.executed = true;
-
             util.startProcedure(procedureCode);
         }
     }
 
-    argumentReporterStringNumber(args, util) {
+    argumentReporterStringNumber (args, util) {
         const value = util.getParam(args.VALUE);
         if (value === null) {
             // When the parameter is not found in the most recent procedure
@@ -78,7 +65,7 @@ class Scratch3ProcedureBlocks {
         return value;
     }
 
-    argumentReporterBoolean(args, util) {
+    argumentReporterBoolean (args, util) {
         const value = util.getParam(args.VALUE);
         if (value === null) {
             // When the parameter is not found in the most recent procedure

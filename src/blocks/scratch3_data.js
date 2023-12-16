@@ -1,5 +1,4 @@
 const Cast = require('../util/cast');
-const { validateArray } = require('../util/json-block-utilities');
 
 class Scratch3DataBlocks {
     constructor (runtime) {
@@ -32,91 +31,8 @@ class Scratch3DataBlocks {
             data_lengthoflist: this.lengthOfList,
             data_listcontainsitem: this.listContainsItem,
             data_hidelist: this.hideList,
-            data_showlist: this.showList,
-            data_reverselist: this.data_reverselist,
-            data_itemexistslist: this.data_itemexistslist,
-            data_listisempty: this.data_listisempty,
-            data_listarray: this.data_listarray,
-            data_arraylist: this.data_arraylist,
-            data_listforeachnum: this.data_listforeachnum,
-            data_listforeachitem: this.data_listforeachitem
+            data_showlist: this.showList
         };
-    }
-
-    data_reverselist (args, util) {
-        const list = util.target.lookupOrCreateList(
-            args.LIST.id, args.LIST.name);
-        list.value.reverse();
-        list._monitorUpToDate = false;
-    }
-    data_itemexistslist (args, util) {
-        const list = util.target.lookupOrCreateList(
-            args.LIST.id, args.LIST.name);
-        const index = Cast.toListIndex(args.INDEX, list.value.length, false);
-        if (index === Cast.LIST_INVALID) {
-            return false;
-        }
-        return true;
-    }
-    data_listisempty (args, util) {
-        const list = util.target.lookupOrCreateList(
-            args.LIST.id, args.LIST.name);
-        return list.value.length < 1;
-    }
-    data_listarray (args, util) {
-        const list = util.target.lookupOrCreateList(
-            args.LIST.id, args.LIST.name);
-        return JSON.stringify(list.value);
-    }
-    data_arraylist (args, util) {
-        const list = util.target.lookupOrCreateList(
-            args.LIST.id, args.LIST.name);
-        const array = validateArray(args.VALUE).array
-            .map(v => {
-                if (typeof v === 'object') return JSON.stringify(v);
-                return String(v);
-            });
-        list.value = array;
-    }
-    data_listforeachnum (args, util) {
-        const list = util.target.lookupOrCreateList(
-            args.LIST.id, args.LIST.name);
-        if (typeof util.stackFrame.loopCounter === 'undefined') {
-            util.stackFrame.loopCounter = list.value.length;
-        }
-        // Only execute once per frame.
-        // When the branch finishes, `repeat` will be executed again and
-        // the second branch will be taken, yielding for the rest of the frame.
-        // Decrease counter
-        util.stackFrame.loopCounter--;
-        // If we still have some left, start the branch.
-        if (util.stackFrame.loopCounter >= 0) {
-            this.setVariableTo({
-                VARIABLE: args.INDEX,
-                VALUE: util.stackFrame.loopCounter
-            }, util);
-            util.startBranch(1, true);
-        }
-    }
-    data_listforeachitem (args, util) {
-        const list = util.target.lookupOrCreateList(
-            args.LIST.id, args.LIST.name);
-        if (typeof util.stackFrame.loopCounter === 'undefined') {
-            util.stackFrame.loopCounter = list.value.length;
-        }
-        // Only execute once per frame.
-        // When the branch finishes, `repeat` will be executed again and
-        // the second branch will be taken, yielding for the rest of the frame.
-        // Decrease counter
-        util.stackFrame.loopCounter--;
-        // If we still have some left, start the branch.
-        if (util.stackFrame.loopCounter >= 0) {
-            this.setVariableTo({
-                VARIABLE: args.INDEX,
-                VALUE: list.value[util.stackFrame.loopCounter]
-            }, util);
-            util.startBranch(1, true);
-        }
     }
 
     getVariable (args, util) {
@@ -210,8 +126,10 @@ class Scratch3DataBlocks {
     addToList (args, util) {
         const list = util.target.lookupOrCreateList(
             args.LIST.id, args.LIST.name);
-        list.value.push(args.ITEM);
-        list._monitorUpToDate = false;
+        if (list.value.length < Scratch3DataBlocks.LIST_ITEM_LIMIT) {
+            list.value.push(args.ITEM);
+            list._monitorUpToDate = false;
+        }
     }
 
     deleteOfList (args, util) {
@@ -243,7 +161,14 @@ class Scratch3DataBlocks {
         if (index === Cast.LIST_INVALID) {
             return;
         }
+        const listLimit = Scratch3DataBlocks.LIST_ITEM_LIMIT;
+        if (index > listLimit) return;
         list.value.splice(index - 1, 0, item);
+        if (list.value.length > listLimit) {
+            // If inserting caused the list to grow larger than the limit,
+            // remove the last element in the list
+            list.value.pop();
+        }
         list._monitorUpToDate = false;
     }
 
@@ -318,6 +243,14 @@ class Scratch3DataBlocks {
             }
         }
         return false;
+    }
+
+    /**
+     * Type representation for list variables.
+     * @const {number}
+     */
+    static get LIST_ITEM_LIMIT () {
+        return 200000;
     }
 }
 

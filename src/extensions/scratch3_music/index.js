@@ -126,14 +126,12 @@ class Scratch3MusicBlocks {
 
         if (!assetData[fullPath]) return;
 
-        const soundFile = assetData[fullPath];
+        // The sound player has already been downloaded via the manifest file required above.
+        const soundBuffer = assetData[fullPath];
 
-        return fetch(soundFile)
-            .then(r => r.arrayBuffer())
-            .then(soundBuffer => this._decodeSound(soundBuffer))
-            .then(player => {
-                playerArray[index] = player;
-            });
+        return this._decodeSound(soundBuffer).then(player => {
+            playerArray[index] = player;
+        });
     }
 
     /**
@@ -804,7 +802,7 @@ class Scratch3MusicBlocks {
                             defaultValue: 0.25
                         }
                     },
-                    hideFromPalette: true
+                    hideFromPalette: false
                 },
                 {
                     opcode: 'restForBeats',
@@ -870,7 +868,7 @@ class Scratch3MusicBlocks {
                             defaultValue: 1
                         }
                     },
-                    hideFromPalette: true
+                    hideFromPalette: false
                 },
                 {
                     opcode: 'setTempo',

@@ -1058,7 +1058,7 @@ class Scratch3WeDo2Blocks {
                             defaultValue: 0.5
                         }
                     },
-                    hideFromPalette: true
+                    hideFromPalette: false
                 },
                 {
                     opcode: 'whenDistance',
@@ -1078,7 +1078,7 @@ class Scratch3WeDo2Blocks {
                             type: ArgumentType.NUMBER,
                             defaultValue: 50
                         }
-                    }
+                    },
                 },
                 {
                     opcode: 'whenTilted',

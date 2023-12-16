@@ -34,6 +34,7 @@ const defaultBuiltinExtensions = {
     boost: () => require('../extensions/scratch3_boost'),
     gdxfor: () => require('../extensions/scratch3_gdx_for'),
     speech2text: () => require('../extensions/scratch3_speech2text'),
+    animText: () => require('../extensions/scratchLab_animatedText')
 };
 
 const coreExtensionList = Object.getOwnPropertyNames(defaultBuiltinExtensions);

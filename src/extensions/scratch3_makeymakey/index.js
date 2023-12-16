@@ -28,6 +28,11 @@ const SEQUENCE_HAT_TIMEOUT = 100;
 const KEY_ID_SPACE = 'SPACE';
 
 /**
+ * An id for the enter key on a keyboard.
+ */
+const KEY_ID_ENTER = 'ENTER';
+
+/**
  * An id for the left arrow key on a keyboard.
  */
 const KEY_ID_LEFT = 'LEFT';
@@ -53,6 +58,7 @@ const KEY_ID_DOWN = 'DOWN';
  */
 const SCRATCH_KEY_NAME = {
     [KEY_ID_SPACE]: 'space',
+    [KEY_ID_ENTER]: 'enter',
     [KEY_ID_LEFT]: 'left arrow',
     [KEY_ID_UP]: 'up arrow',
     [KEY_ID_RIGHT]: 'right arrow',
@@ -121,6 +127,11 @@ class Scratch3MakeyMakeyBlocks {
                 default: 'space',
                 description: 'The space key on a computer keyboard.'
             }),
+            [KEY_ID_ENTER]: formatMessage({
+                id: 'makeymakey.enterKey',
+                default: 'enter',
+                description: 'The enter key on a computer keyboard.'
+            }),
             [KEY_ID_LEFT]: formatMessage({
                 id: 'makeymakey.leftArrowShort',
                 default: 'left',
@@ -160,7 +171,9 @@ class Scratch3MakeyMakeyBlocks {
             `${KEY_ID_UP} ${KEY_ID_RIGHT} ${KEY_ID_DOWN} ${KEY_ID_LEFT}`,
             `${KEY_ID_UP} ${KEY_ID_LEFT} ${KEY_ID_DOWN} ${KEY_ID_RIGHT}`,
             `${KEY_ID_UP} ${KEY_ID_UP} ${KEY_ID_DOWN} ${KEY_ID_DOWN} ` +
-                `${KEY_ID_LEFT} ${KEY_ID_RIGHT} ${KEY_ID_LEFT} ${KEY_ID_RIGHT}`
+            `${KEY_ID_LEFT} ${KEY_ID_RIGHT} ${KEY_ID_LEFT} ${KEY_ID_RIGHT}` +
+            `${KEY_ID_LEFT} ${KEY_ID_RIGHT} ${KEY_ID_UP} ${KEY_ID_DOWN}` +
+            `${KEY_ID_ENTER}`
         ];
     }
 
@@ -204,23 +217,6 @@ class Scratch3MakeyMakeyBlocks {
                             defaultValue: this.DEFAULT_SEQUENCES[0]
                         }
                     }
-                },
-                "---",
-                {
-                    opcode: 'isMakeyKeyPressed',
-                    text: formatMessage({
-                        id: 'makeymakey.isKeyPressed',
-                        default: 'is [KEY] key pressed',
-                        description: 'is a keyboard key is pressed'
-                    }),
-                    blockType: BlockType.BOOLEAN,
-                    arguments: {
-                        KEY: {
-                            type: ArgumentType.STRING,
-                            menu: 'KEY',
-                            defaultValue: KEY_ID_SPACE
-                        }
-                    }
                 }
             ],
             menus: {
@@ -234,6 +230,14 @@ class Scratch3MakeyMakeyBlocks {
                                 description: 'The space key on a computer keyboard.'
                             }),
                             value: KEY_ID_SPACE
+                        },
+                        {
+                            text: formatMessage({
+                                id: 'makeymakey.enterKey',
+                                default: 'enter',
+                                description: 'The enter key on a computer keyboard.'
+                            }),
+                            value: KEY_ID_ENTER
                         },
                         {
                             text: formatMessage({
@@ -267,12 +271,43 @@ class Scratch3MakeyMakeyBlocks {
                             }),
                             value: KEY_ID_LEFT
                         },
-                        {text: 'w', value: 'w'},
                         {text: 'a', value: 'a'},
-                        {text: 's', value: 's'},
+                        {text: 'b', value: 'b'},
+                        {text: 'c', value: 'c'},
                         {text: 'd', value: 'd'},
+                        {text: 'e', value: 'e'},
                         {text: 'f', value: 'f'},
-                        {text: 'g', value: 'g'}
+                        {text: 'g', value: 'g'},
+                        {text: 'h', value: 'h'},
+                        {text: 'i', value: 'i'},
+                        {text: 'j', value: 'j'},
+                        {text: 'k', value: 'k'},
+                        {text: 'l', value: 'l'},
+                        {text: 'm', value: 'm'},
+                        {text: 'n', value: 'n'},
+                        {text: 'o', value: 'o'},
+                        {text: 'p', value: 'p'},
+                        {text: 'q', value: 'q'},
+                        {text: 'r', value: 'r'},
+                        {text: 's', value: 's'},
+                        {text: 't', value: 't'},
+                        {text: 'u', value: 'u'},
+                        {text: 'v', value: 'v'},
+                        {text: 'w', value: 'w'},
+                        {text: 'x', value: 'x'},
+                        {text: 'y', value: 'y'},
+                        {text: 'z', value: 'z'},
+                        {text: '0', value: '0'},
+                        {text: '1', value: '1'},
+                        {text: '2', value: '2'},
+                        {text: '3', value: '3'},
+                        {text: '4', value: '4'},
+                        {text: '5', value: '5'},
+                        {text: '6', value: '6'},
+                        {text: '7', value: '7'},
+                        {text: '8', value: '8'},
+                        {text: '9', value: '9'},
+                        {text: 'enter', value: 'enter'},
                     ]
                 },
                 SEQUENCE: {
@@ -325,16 +360,6 @@ class Scratch3MakeyMakeyBlocks {
         }
         const isDown = util.ioQuery('keyboard', 'getKeyIsDown', [key]);
         return (isDown && this.frameToggle);
-    }
-
-    isMakeyKeyPressed (args, util) {
-        let key = args.KEY;
-        // Convert the key arg, if it is a KEY_ID, to the key name used by
-        // the Keyboard io module.
-        if (SCRATCH_KEY_NAME[args.KEY]) {
-            key = SCRATCH_KEY_NAME[args.KEY];
-        }
-        return util.ioQuery('keyboard', 'getKeyIsDown', [key]);
     }
 
     /*
@@ -395,7 +420,7 @@ class Scratch3MakeyMakeyBlocks {
      */
     addSequence (sequenceString, sequenceArray) {
         // If we already have this sequence string, return.
-        if (this.sequences.hasOwnProperty(sequenceString)) {
+        if (Object.prototype.hasOwnProperty.call(this.sequences, sequenceString)) {
             return;
         }
         this.sequences[sequenceString] = {

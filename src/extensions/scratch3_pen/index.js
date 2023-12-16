@@ -421,6 +421,10 @@ class Scratch3PenBlocks {
                 },
                 /* Legacy blocks, should not be shown in flyout */
                 {
+                    blockType: "LABEL",
+                    text: 'Legacy Blocks'
+                },
+                {
                     opcode: 'setPenShadeToNumber',
                     blockType: BlockType.COMMAND,
                     text: formatMessage({

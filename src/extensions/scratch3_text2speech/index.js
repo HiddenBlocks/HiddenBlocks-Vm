@@ -559,7 +559,8 @@ class Scratch3Text2SpeechBlocks {
                             type: ArgumentType.NUMBER,
                             defaultValue: 100
                         }
-                    }
+                    },
+                    hidefromPalette: true
                 }
             ],
             menus: {
